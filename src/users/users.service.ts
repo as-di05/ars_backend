@@ -105,6 +105,7 @@ export class UsersService {
         first_name AS firstName,
         last_name AS lastName,
         phone_number AS phoneNumber,
+        avatar_url AS avatarUrl,
         JSON_OBJECT(
           'id', r.id,
           'label', name
@@ -131,6 +132,7 @@ export class UsersService {
         first_name AS firstName,
         last_name AS lastName,
         phone_number AS phoneNumber,
+        avatar_url AS avatarUrl,
         JSON_OBJECT(
           'id', r.id,
           'label', name

@@ -32,6 +32,7 @@ export interface UserDto {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  avatarUrl?: string;
 }
 
 export interface FullUserDto extends UserDto {
