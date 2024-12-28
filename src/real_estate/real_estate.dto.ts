@@ -1,9 +1,19 @@
+import { UserDto } from "src/users/users.dto";
+
 export interface RealEstateDto {
   id: number;
+  category: {
+    id: number;
+    label: string;
+  };
   idFloor: number;
   idSeries: number;
   idRoom: number;
-  idDealType: number;
+  dealType: {
+    id: number;
+    label: string;
+  };
+  employee: UserDto;
   idWallMaterial: number;
   ownerName: string;
   ownerPhone: string;
@@ -15,6 +25,7 @@ export interface RealEstateDto {
   district: string;
   description: string;
   prices?: PriceDto[];
+
   documents?: {
     id: number;
     label: string;

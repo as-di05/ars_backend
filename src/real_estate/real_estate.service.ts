@@ -240,8 +240,22 @@ export class RealEstateService {
             re.id, 
             re.id_floor AS idFloor, 
             re.id_series AS idSeries, 
+            JSON_OBJECT(
+                'id', c.id,
+                'label', c.label
+            ) AS category,
+            JSON_OBJECT(
+                'id', dp.id,
+                'label', dp.label
+            ) AS dealType,
+            JSON_OBJECT(
+                'id', u.id,
+                'firstName', u.first_name,
+                'lastName', u.last_name,
+                'phone', u.phone_number,
+                'roleId', u.role_id
+            ) AS employee,
             re.id_room AS idRoom, 
-            re.id_deal_type AS idDealType, 
             re.id_wall_material AS idWallMaterial, 
             re.owner_phone AS ownerPhone, 
             re.owner_name AS ownerName, 
@@ -265,6 +279,7 @@ export class RealEstateService {
         FROM real_estate_objects re
         INNER JOIN users u ON u.id = re.employee_id
         INNER JOIN categories c ON c.id = re.category_id
+        LEFT JOIN deal_types dp ON dp.id = re.id_deal_type
     `;
     try {
       const res = await this.dbService.query(query, []);
