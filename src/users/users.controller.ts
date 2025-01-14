@@ -69,10 +69,16 @@ export class UsersController {
     );
   }
 
+
+  @Get('/me')
+  async getMe(@Req() req: any): Promise<UserDto> {
+    const { userId, roleId } = req.user;
+    return this.usersService.getUser(+userId, roleId === 1);
+  }
+
   @Get(':id')
   async getUser(@Req() req: any, @Param('id') id: number): Promise<UserDto> {
     const { userId, roleId } = req.user;
-
     if (id && roleId > 1 && userId !== +id) {
       throw new ForbiddenException('Access denied!');
     }

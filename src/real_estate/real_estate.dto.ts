@@ -1,4 +1,6 @@
-import { UserDto } from "src/users/users.dto";
+import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { UserDto } from 'src/users/users.dto';
 
 export interface RealEstateDto {
   id: number;
@@ -13,6 +15,10 @@ export interface RealEstateDto {
     id: number;
     label: string;
   };
+  district: {
+    id: number;
+    label: string;
+  };
   employee: UserDto;
   idWallMaterial: number;
   ownerName: string;
@@ -22,7 +28,6 @@ export interface RealEstateDto {
   createdAt: string;
   updatedAt: string;
   area: number;
-  district: string;
   description: string;
   prices?: PriceDto[];
 
@@ -41,7 +46,7 @@ export interface InputRealEstateDto {
   area?: number;
   idFloor?: number;
   idSeries?: number;
-  district?: string;
+  idDistrict?: number;
   idDealType?: number;
   idWallMaterial?: number;
   description?: string;
@@ -62,4 +67,24 @@ export interface InputPriceDto {
   ownerPrice?: number;
   objectPrice?: number;
   currency?: string;
+}
+
+export class GetRealEstatesQueryDto {
+  @IsOptional()
+  @IsString()
+  users?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  id?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  categoryId?: number;
+
+  @IsOptional()
+  @IsString()
+  sortColumn?: string;
 }

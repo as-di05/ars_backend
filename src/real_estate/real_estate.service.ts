@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/db/database.service';
 import {
+  GetRealEstatesQueryDto,
   InputPriceDto,
   InputRealEstateDto,
   RealEstateDto,
@@ -25,7 +26,7 @@ export class RealEstateService {
             area,
             id_floor,
             id_series,
-            district,
+            id_district,
             id_deal_type,
             id_wall_material,
             description
@@ -42,7 +43,7 @@ export class RealEstateService {
         input.area ?? null,
         input.idFloor ?? null,
         input.idSeries ?? null,
-        input.district ?? null,
+        input.idDistrict ?? null,
         input.idDealType ?? null,
         input.idWallMaterial ?? null,
         input.description ?? null,
@@ -112,9 +113,9 @@ export class RealEstateService {
       updates.push('id_series = ?');
       params.push(input.idSeries);
     }
-    if (input.district?.length) {
-      updates.push('district = ?');
-      params.push(input.district);
+    if (input.idDistrict) {
+      updates.push('id_district = ?');
+      params.push(input.idDistrict);
     }
     if (input.idDealType) {
       updates.push('id_deal_type = ?');
@@ -216,8 +217,10 @@ export class RealEstateService {
   async getRealEstates(
     userId: number,
     roleId: number,
-    users?: number[],
+    params: GetRealEstatesQueryDto,
   ): Promise<RealEstateDto[]> {
+    const { users, id, categoryId } = params;
+
     let filterPrice = 'NULL AS prices';
     if (roleId === 1) {
       filterPrice = `
@@ -235,6 +238,23 @@ export class RealEstateService {
             ) AS prices
         `;
     }
+
+    let filters = '';
+    if (id) {
+      filters = `WHERE re.id = ${id}`;
+    } else if (categoryId) {
+      filters = `WHERE re.category_id = ${categoryId}`;
+    }
+
+    let sortColumn = 're.created_at';
+    const allowedSortColumns: { [key: string]: string } = {
+      created: 're.created_at',
+      lastUpdated: 're.updated_at',
+    };
+    if (params.sortColumn && allowedSortColumns[params.sortColumn]) {
+      sortColumn = allowedSortColumns[params.sortColumn];
+    }
+
     const query = `
         SELECT 
             re.id, 
@@ -255,6 +275,10 @@ export class RealEstateService {
                 'phone', u.phone_number,
                 'roleId', u.role_id
             ) AS employee,
+            JSON_OBJECT(
+                'id', d.id,
+                'label', d.label
+            ) AS district,
             re.id_room AS idRoom, 
             re.id_wall_material AS idWallMaterial, 
             re.owner_phone AS ownerPhone, 
@@ -263,8 +287,7 @@ export class RealEstateService {
             re.status_updated_at AS statusUpdatedAt, 
             re.created_at AS createdAt, 
             re.updated_at AS updatedAt, 
-            re.area, 
-            re.district, 
+            re.area,
             re.description,
              (SELECT JSON_ARRAYAGG(
                     JSON_OBJECT(
@@ -280,6 +303,9 @@ export class RealEstateService {
         INNER JOIN users u ON u.id = re.employee_id
         INNER JOIN categories c ON c.id = re.category_id
         LEFT JOIN deal_types dp ON dp.id = re.id_deal_type
+        LEFT JOIN districts d ON d.id = re.id_district
+        ${filters}
+        ORDER BY ${sortColumn} DESC
     `;
     try {
       const res = await this.dbService.query(query, []);

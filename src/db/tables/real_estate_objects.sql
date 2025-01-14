@@ -44,6 +44,7 @@ CREATE TABLE real_estate_objects (
     id_series INTEGER UNSIGNED DEFAULT NULL,
     district VARCHAR(255) DEFAULT NULL,
     id_deal_type INTEGER UNSIGNED DEFAULT NULL,
+    id_district INTEGER UNSIGNED DEFAULT NULL,
     id_wall_material INTEGER UNSIGNED DEFAULT NULL,
     owner_phone VARCHAR(255) DEFAULT NULL,
     owner_name VARCHAR(255) DEFAULT NULL,
@@ -55,6 +56,7 @@ CREATE TABLE real_estate_objects (
 
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (employee_id) REFERENCES users(id),
+    FOREIGN KEY (id_district) REFERENCES districts(id),
     FOREIGN KEY (id_room) REFERENCES rooms(id),
     FOREIGN KEY (id_floor) REFERENCES floors(id),
     FOREIGN KEY (id_series) REFERENCES re_series(id),

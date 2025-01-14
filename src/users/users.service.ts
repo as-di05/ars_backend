@@ -196,10 +196,10 @@ export class UsersService {
     const query = `SELECT * FROM users  WHERE login = ?`;
     try {
       const [user] = await this.dbService.query(query, [login]);
-      if (user && user.id) {
-        return user;
+      if (!user || !user.id) {
+        throw new Error('User is not found!');
       }
-      return null;
+      return user;
     } catch (error) {
       throw new Error('User is not found!');
     }

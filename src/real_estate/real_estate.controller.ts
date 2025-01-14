@@ -10,7 +10,11 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt.auth.quard';
 import { RealEstateService } from './real_estate.service';
-import { InputRealEstateDto, RealEstateDto } from './real_estate.dto';
+import {
+  GetRealEstatesQueryDto,
+  InputRealEstateDto,
+  RealEstateDto,
+} from './real_estate.dto';
 import { ApiResponseDto } from 'src/common/common.dto';
 
 @Controller('real-estate')
@@ -39,9 +43,9 @@ export class RealEstateController {
   @Get()
   async getRealEstates(
     @Req() req: any,
-    @Query('users') users?: number[],
+    @Query() query: GetRealEstatesQueryDto,
   ): Promise<RealEstateDto[]> {
     const { userId, roleId } = req.user;
-    return this.realEstateService.getRealEstates(userId, roleId, users);
+    return this.realEstateService.getRealEstates(userId, roleId, query);
   }
 }
