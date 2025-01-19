@@ -1,4 +1,4 @@
-import { IsEmpty, IsNumber, IsString, MinLength } from 'class-validator';
+import { IsEmpty, IsInt, IsNumber, IsString, MinLength } from 'class-validator';
 
 export class UpdatePasswordDto {
   @IsEmpty()
@@ -29,6 +29,7 @@ export interface UserBdDto {
 export interface UserDto {
   id: number;
   roleId: number;
+  login: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;
@@ -38,14 +39,24 @@ export interface UserDto {
 export interface FullUserDto extends UserDto {
   userName?: string;
 }
-
 export class CreateUserDto {
+  @IsString()
   login: string;
+
+  @IsString()
   password: string;
+
+  @IsString()
   firstName: string;
+
+  @IsString()
   lastName: string;
-  phoneNumber?: string;
-  roleId?: number;
+
+  @IsString()
+  phoneNumber: string;
+
+  @IsInt()
+  roleId: number;
 }
 
 export class UpdateUserDto {

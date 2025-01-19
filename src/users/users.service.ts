@@ -15,37 +15,91 @@ import {
 } from './users.dto';
 import * as bcrypt from 'bcrypt';
 import { ApiResponseDto } from 'src/common/common.dto';
+import * as sharp from 'sharp';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async createUser(adminRoleId: number, createUserDto: CreateUserDto) {
+  async createUser(
+    adminRoleId: number,
+    createUserDto: CreateUserDto,
+    avatarFile?: Express.Multer.File,
+  ): Promise<ApiResponseDto> {
     if (adminRoleId !== 1) {
       throw new ForbiddenException(
         'Access denied. Only admins can create users.',
       );
     }
+
+    if (!createUserDto || Object.keys(createUserDto).length === 0) {
+      return {
+        status: false,
+        message: 'Invalid request. User data is required.',
+      };
+    }
+
     if (createUserDto.roleId === 1) {
       throw new ForbiddenException('Access denied!');
     }
-    const query_text = `
-        INSERT INTO users (login, password_hash, role_id, first_name, last_name, phone_number) 
-        VALUES (?, ?, ?, ?, ?, ?)
+
+    if (!createUserDto.password) {
+      return {
+        status: false,
+        message: 'Password is required',
+      };
+    }
+
+    const uploadDir = path.join(process.cwd(), 'uploads', 'avatars');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    let avatarUrl = null;
+    if (avatarFile) {
+      const fileExtension = avatarFile.mimetype.split('/')[1];
+      const fileName = `${Date.now()}-${createUserDto.login}.${fileExtension}`;
+      const filePath = path.join(uploadDir, fileName);
+
+      try {
+        await sharp(avatarFile.buffer)
+          .resize({ width: 150, height: 150 })
+          .jpeg({ quality: 80 })
+          .toFile(filePath);
+
+        avatarUrl = `/uploads/avatars/${fileName}`;
+      } catch (error) {
+        console.error('Error processing avatar:', error);
+        return {
+          status: false,
+          message: 'Error processing avatar image',
+        };
+      }
+    }
+
+    const queryText = `
+      INSERT INTO users (login, password_hash, role_id, first_name, last_name, phone_number, avatar_url) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
+
     try {
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-      await this.dbService.query(query_text, [
+      await this.dbService.query(queryText, [
         createUserDto.login,
         hashedPassword,
         createUserDto.roleId ?? 3,
         createUserDto.firstName,
         createUserDto.lastName,
         createUserDto.phoneNumber,
+        avatarUrl,
       ]);
-      return { message: 'User created successfully' };
+
+      return { status: true, message: 'User created successfully' };
     } catch (err) {
-      console.log('Error in createUser', err);
+      console.error('Error in createUser', err);
+      return { status: false, message: 'Error creating user' };
     }
   }
 
@@ -102,6 +156,7 @@ export class UsersService {
     const query = `
       SELECT 
         u.id,
+        login,
         first_name AS firstName,
         last_name AS lastName,
         phone_number AS phoneNumber,
@@ -112,6 +167,7 @@ export class UsersService {
         ) AS role
       FROM users u
       INNER JOIN roles r ON r.id = u.role_id
+      ORDER BY u.id ASC
     `;
     const res = await this.dbService.query(query);
     if (Array.isArray(res) && res.length) {
@@ -196,12 +252,29 @@ export class UsersService {
     const query = `SELECT * FROM users  WHERE login = ?`;
     try {
       const [user] = await this.dbService.query(query, [login]);
-      if (user && user.id) {
-        return user;
+      if (!user || !user.id) {
+        throw new Error('User is not found!');
       }
-      return null;
+      return user;
     } catch (error) {
       throw new Error('User is not found!');
+    }
+  }
+
+  async deleteUserById(userId: number): Promise<ApiResponseDto> {
+    if (!userId) {
+      return { status: false, message: 'User ID is required' };
+    }
+    const queryText = `DELETE FROM users WHERE id = ?`;
+    try {
+      const result = await this.dbService.query(queryText, [userId]);
+      if (result.affectedRows === 0) {
+        return { status: false, message: 'User not found' };
+      }
+      return { status: true, message: 'User deleted successfully' };
+    } catch (error) {
+      console.error('Error in deleteUserById:', error);
+      return { status: false, message: 'Error deleting user' };
     }
   }
 }

@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-console.log(dotenv.config(), '-----dotenv');
-console.log(process.env.DB_HOST, '-------');
-console.log(process.env.DB_USER);
-console.log(process.env.DB_PASSWORD);
+// console.log(dotenv.config(), '-----dotenv');
+// console.log(process.env.DB_HOST, '-------');
+// console.log(process.env.DB_USER);
+// console.log(process.env.DB_PASSWORD);
 
 import { Knex } from 'knex';
 
