@@ -294,7 +294,7 @@ export class RealEstateService {
     params: GetRealEstatesQueryDto,
   ): Promise<RealEstateDto[]> {
     const { users, id, search, isFavorites, filter, onlyMy } = params;
-    const baseUrl = 'http://localhost:3001';
+    const baseUrl = process.env.BASE_URL ?? 'http://localhost:3001';
     let otherFilters: string[] = [];
     let queryParams: any[] = [];
 
