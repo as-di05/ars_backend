@@ -9,9 +9,9 @@ async function bootstrap() {
 
   app.use(express.static(join(__dirname, '..', 'public')));
 
-  app.use('*', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  });
+  // app.use('*', (req, res) => {
+  //   res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+  // });
 
   app.enableCors({
     origin: 'https://turan-nedvijimost-27595b75bbe9.herokuapp.com',
