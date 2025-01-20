@@ -119,18 +119,18 @@ export class UsersService {
         return new ApiResponseDto(false, 'User not found', null, userId);
       }
 
-      const passwordMatch = await bcrypt.compare(
-        currentPassword,
-        res[0].password_hash,
-      );
-      if (!passwordMatch) {
-        return new ApiResponseDto(
-          false,
-          'Current password is incorrect',
-          null,
-          userId,
-        );
-      }
+      // const passwordMatch = await bcrypt.compare(
+      //   currentPassword,
+      //   res[0].password_hash,
+      // );
+      // if (!passwordMatch) {
+      //   return new ApiResponseDto(
+      //     false,
+      //     'Current password is incorrect',
+      //     null,
+      //     userId,
+      //   );
+      // }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
       query_text = `UPDATE users SET password_hash = ? WHERE id = ?`;
