@@ -69,6 +69,7 @@ export class UsersController {
     @Req() req: any,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): Promise<ApiResponseDto> {
+    console.log(updatePasswordDto, '-------------')
     // const { userId, roleId } = req.user;
 
     // if (
