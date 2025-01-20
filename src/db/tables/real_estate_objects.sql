@@ -34,6 +34,12 @@ CREATE TABLE re_statuses (
 );
 -- INSERT INTO re_statuses(label) values('Неактуально');
 
+CREATE TABLE wall_materials (
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(50) UNIQUE NOT NULL
+);
+-- INSERT INTO wall_materials(label) values('Центральное');
+
 CREATE TABLE re_heatings (
     id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     label VARCHAR(50) UNIQUE NOT NULL
