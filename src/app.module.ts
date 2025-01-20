@@ -15,14 +15,17 @@ import { join } from 'path';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
     DatabaseModule,
-    UsersModule,
-    AuthModule,
-    CategoriesModule,
-    RealEstateModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'), 
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    UsersModule,
+    AuthModule,
+    CategoriesModule,
+    RealEstateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
