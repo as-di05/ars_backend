@@ -14,6 +14,7 @@ async function bootstrap() {
   // });
 
   app.enableCors({
+    // origin: 'http://localhost:3000',
     origin: 'https://turan-nedvijimost-27595b75bbe9.herokuapp.com',
   });
 
