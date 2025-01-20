@@ -24,7 +24,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(process.env.PORT ?? 3001);
+
+  await app.listen(process.env.PORT || 3001, '0.0.0.0');
 
   const url = await app.getUrl();
   console.log(`Server is running at: ${url}`);
