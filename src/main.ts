@@ -7,7 +7,6 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-
   app.use(express.static(join(__dirname, '..', 'public')));
 
   app.use('*', (req, res) => {
@@ -26,5 +25,8 @@ async function bootstrap() {
     }),
   );
   await app.listen(process.env.PORT ?? 3001);
+
+  const url = await app.getUrl();
+  console.log(`Server is running at: ${url}`);
 }
 bootstrap();
