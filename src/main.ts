@@ -12,9 +12,10 @@ async function bootstrap() {
 
   app.use('*', (req, res, next) => {
     if (req.originalUrl.startsWith('/api')) {
-      return next(); 
+      return next(); // Пропускаем API-запросы
     }
-    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+    // Для всех остальных запросов возвращаем index.html
+    // res.sendFile(join(__dirname, '..', 'public', 'index.html'));
   });
 
   app.enableCors({
