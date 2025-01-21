@@ -9,9 +9,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(express.static(join(__dirname, '..', 'public')));
 
-  app.use('*', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  });
+  // app.use('*', (req, res) => {
+  //   res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+  // });
 
   app.enableCors({
     // origin: 'http://localhost:3000',
