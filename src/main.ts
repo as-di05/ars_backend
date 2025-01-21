@@ -3,29 +3,20 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  app.setGlobalPrefix('api');
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(express.static(join(__dirname, '..', 'public')));
 
-  app.use('*', (req, res, next) => {
-    if (req.originalUrl.startsWith('/api')) {
-      return next(); // Пропускаем API-запросы
-    }
-    // Для всех остальных запросов возвращаем index.html
+  app.use('*', (req, res) => {
     res.sendFile(join(__dirname, '..', 'public', 'index.html'));
   });
 
   app.enableCors({
     // origin: 'http://localhost:3000',
-    origin:
-      process.env.BASE_URL ||
-      'https://turan-nedvijimost-27595b75bbe9.herokuapp.com',
+    origin: process.env.BASE_URL || 'https://turan-nedvijimost-27595b75bbe9.herokuapp.com',
   });
-
-
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

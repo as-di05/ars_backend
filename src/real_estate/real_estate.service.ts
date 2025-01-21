@@ -294,8 +294,8 @@ export class RealEstateService {
     params: GetRealEstatesQueryDto,
   ): Promise<RealEstateDto[]> {
     const { users, id, search, isFavorites, filter, onlyMy } = params;
-    const baseUrl = 'https://turan-nedvijimost-27595b75bbe9.herokuapp.com/api';
-    // const baseUrl = 'http://localhost:3001/api';
+    const baseUrl = 'https://turan-nedvijimost-27595b75bbe9.herokuapp.com';
+    // const baseUrl = 'http://localhost:3001';
     let otherFilters: string[] = [];
     let queryParams: any[] = [];
 
