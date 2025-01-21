@@ -15,9 +15,7 @@ import { join } from 'path';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
     DatabaseModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'), 
-    }),
+
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
