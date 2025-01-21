@@ -15,7 +15,7 @@ async function bootstrap() {
       return next(); // Пропускаем API-запросы
     }
     // Для всех остальных запросов возвращаем index.html
-    // res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
   });
 
   app.enableCors({
