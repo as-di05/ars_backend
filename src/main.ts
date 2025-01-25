@@ -15,7 +15,7 @@ async function bootstrap() {
 
   app.enableCors({
     // origin: 'http://localhost:3000',
-    origin: process.env.BASE_URL || 'https://turan-nedvijimost-27595b75bbe9.herokuapp.com',
+    origin: process.env.BASE_URL || 'https://turan-nedvijimost.kg',
   });
   app.useGlobalPipes(
     new ValidationPipe({
