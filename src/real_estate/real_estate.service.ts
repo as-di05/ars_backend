@@ -11,7 +11,10 @@ import { ApiResponseDto } from 'src/common/common.dto';
 import * as sharp from 'sharp';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as AWS from 'aws-sdk';
 import { transformSearchText } from 'src/utils/utils';
+
+const s3 = new AWS.S3();
 
 @Injectable()
 export class RealEstateService {
@@ -219,23 +222,26 @@ export class RealEstateService {
     if (!idRealEstate) {
       return { status: false, message: 'ID Real Estate not found' };
     }
-    const uploadDir = path.join(process.cwd(), 'uploads', 'images');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
 
     const compressedImages = [];
     for (const file of images) {
       const fileExtension = file.mimetype.split('/')[1];
       const fileName = `${Date.now()}-${file.originalname.split('.')[0]}.${fileExtension}`;
-      const filePath = path.join(uploadDir, fileName);
 
-      await sharp(file.buffer)
-        .resize({ width: 800 })
-        .jpeg({ quality: 80 })
-        .toFile(filePath);
-
-      compressedImages.push([idRealEstate, fileName]);
+      const uploadParams = {
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: `images/${fileName}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ACL: 'public-read',
+      };
+      try {
+        await s3.upload(uploadParams).promise();
+        compressedImages.push([idRealEstate, fileName]);
+      } catch (err) {
+        console.log('Error uploading to S3:', err);
+        return { status: false, message: 'Error uploading images to S3' };
+      }
     }
 
     const query_text = `

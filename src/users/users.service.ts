@@ -18,6 +18,9 @@ import { ApiResponseDto } from 'src/common/common.dto';
 import * as sharp from 'sharp';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as AWS from 'aws-sdk';
+
+const s3 = new AWS.S3();
 
 @Injectable()
 export class UsersService {
@@ -52,24 +55,28 @@ export class UsersService {
       };
     }
 
-    const uploadDir = path.join(process.cwd(), 'uploads', 'avatars');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     let avatarUrl = null;
     if (avatarFile) {
       const fileExtension = avatarFile.mimetype.split('/')[1];
       const fileName = `${Date.now()}-${createUserDto.login}.${fileExtension}`;
-      const filePath = path.join(uploadDir, fileName);
 
       try {
-        await sharp(avatarFile.buffer)
+        const compressedImage = await sharp(avatarFile.buffer)
           .resize({ width: 150, height: 150 })
           .jpeg({ quality: 80 })
-          .toFile(filePath);
+          .toBuffer();
 
-        avatarUrl = `/uploads/avatars/${fileName}`;
+        const uploadResult = await s3
+          .upload({
+            Bucket: process.env.AWS_S3_BUCKET,
+            Key: `avatars/${fileName}`,
+            Body: compressedImage,
+            ContentType: avatarFile.mimetype,
+            ACL: 'public-read',
+          })
+          .promise();
+
+        avatarUrl = uploadResult.Location;
       } catch (error) {
         console.error('Error processing avatar:', error);
         return {
