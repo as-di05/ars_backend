@@ -241,8 +241,9 @@ export class RealEstateService {
         // ACL: 'public-read',
       };
       try {
-        await s3.upload(uploadParams).promise();
-        compressedImages.push([idRealEstate, fileName]);
+        const uploadResult = await s3.upload(uploadParams).promise();
+        const imageUrl = uploadResult.Location;
+        compressedImages.push([idRealEstate, imageUrl]);
       } catch (err) {
         console.log('Error uploading to S3:', err);
         return { status: false, message: 'Error uploading images to S3' };
