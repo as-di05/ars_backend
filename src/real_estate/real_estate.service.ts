@@ -228,10 +228,15 @@ export class RealEstateService {
       const fileExtension = file.mimetype.split('/')[1];
       const fileName = `${Date.now()}-${file.originalname.split('.')[0]}.${fileExtension}`;
 
+      const compressedBuffer = await sharp(file.buffer)
+        .resize({ width: 800 })
+        .jpeg({ quality: 80 })
+        .toBuffer();
+
       const uploadParams = {
         Bucket: process.env.AWS_S3_BUCKET,
         Key: `images/${fileName}`,
-        Body: file.buffer,
+        Body: compressedBuffer,
         ContentType: file.mimetype,
         // ACL: 'public-read',
       };
@@ -450,7 +455,7 @@ export class RealEstateService {
           (SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
                     'id', rp.id,
-                    'url', CONCAT('${baseUrl}/uploads/images/', rp.name)
+                    'url', rp.name
                 )
             ) FROM re_photos rp
             WHERE rp.id_real_estate = re.id
