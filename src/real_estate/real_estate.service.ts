@@ -233,7 +233,7 @@ export class RealEstateService {
         Key: `images/${fileName}`,
         Body: file.buffer,
         ContentType: file.mimetype,
-        ACL: 'public-read',
+        // ACL: 'public-read',
       };
       try {
         await s3.upload(uploadParams).promise();

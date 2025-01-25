@@ -72,7 +72,7 @@ export class UsersService {
             Key: `avatars/${fileName}`,
             Body: compressedImage,
             ContentType: avatarFile.mimetype,
-            ACL: 'public-read',
+            // ACL: 'public-read',
           })
           .promise();
 
