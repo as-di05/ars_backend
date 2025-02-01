@@ -12,6 +12,19 @@ async function bootstrap() {
   // app.use('*', (req, res) => {
   //   res.sendFile(join(__dirname, '..', 'public', 'index.html'));
   // });
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      return res.redirect(`https://${req.hostname}${req.url}`);
+    }
+    next();
+  });
+
+  app.use((req, res, next) => {
+    if (req.hostname === 'www.turan-nedvijimost.kg') {
+      return res.redirect(301, `https://turan-nedvijimost.kg${req.url}`);
+    }
+    next();
+  });
 
   app.enableCors({
     // origin: 'http://localhost:3000',

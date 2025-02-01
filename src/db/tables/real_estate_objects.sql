@@ -89,7 +89,7 @@ CREATE TABLE re_documents (
 CREATE TABLE re_photos (
     id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     id_real_estate INTEGER UNSIGNED NOT NULL,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(250) NOT NULL,
     FOREIGN KEY (id_real_estate) REFERENCES real_estate_objects(id) ON DELETE CASCADE
 );
 
