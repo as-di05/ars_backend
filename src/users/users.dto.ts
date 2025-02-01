@@ -61,28 +61,15 @@ export class CreateUserDto {
 
 export class UpdateUserDto {
   @IsString()
-  @MinLength(3, {
-    message: 'Login must be at least 3 characters long',
-  })
   login: string;
 
   @IsString()
-  @MinLength(3, {
-    message: 'The user firstName must be at least 3 characters long',
-  })
   firstName: string;
 
   @IsString()
-  @MinLength(3, {
-    message: 'The user lastName must be at least 3 characters long',
-  })
   lastName: string;
 
   @IsString()
-  @MinLength(13, {
-    message:
-      "The user's phoneNumber must be at least 13 characters long and must have a + sign",
-  })
   phoneNumber: string | null;
 
   @IsNumber()
