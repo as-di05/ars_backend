@@ -17,6 +17,7 @@ import {
   CommonType,
   GetRealEstatesQueryDto,
   InputRealEstateDto,
+  InputStatusRealEstateDto,
   RealEstateDto,
 } from './real_estate.dto';
 import { ApiResponseDto } from 'src/common/common.dto';
@@ -49,6 +50,15 @@ export class RealEstateController {
   ): Promise<ApiResponseDto> {
     const { userId } = req.user;
     return this.realEstateService.updateRealEstate(userId, input);
+  }
+
+  @Post('update-status')
+  async updateStatusRealEstate(
+    @Req() req: any,
+    @Body() input: InputStatusRealEstateDto,
+  ): Promise<ApiResponseDto> {
+    const { userId } = req.user;
+    return this.realEstateService.updateStatusRealEstate(userId, input);
   }
 
   @Get()
