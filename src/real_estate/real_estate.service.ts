@@ -5,6 +5,7 @@ import {
   GetRealEstatesQueryDto,
   InputPriceDto,
   InputRealEstateDto,
+  InputStatusRealEstateDto,
   RealEstateDto,
 } from './real_estate.dto';
 import { ApiResponseDto } from 'src/common/common.dto';
@@ -95,6 +96,34 @@ export class RealEstateService {
     } catch (err) {
       console.log('Error in createRealEstate', err);
       return { status: false, message: 'Failed to create real estate' };
+    }
+  }
+
+  async updateStatusRealEstate(
+    userId: number,
+    input: InputStatusRealEstateDto,
+  ): Promise<ApiResponseDto> {
+    if (!input.id || !input.statusId || !userId) {
+      return { status: false, message: 'ID not found' };
+    }
+    let query_text = `SELECT id_status FROM real_estate_objects WHERE id = ? AND employee_id = ?`;
+    try {
+      const res = await this.dbService.query(query_text, [input.id, userId]);
+      if (
+        !Array.isArray(res) ||
+        !res.length ||
+        res[0]?.id_status === input.statusId
+      ) {
+        return { status: false, message: 'Internal Server Error!' };
+      }
+      query_text = `UPDATE real_estate_objects SET id_status = ?, status_updated_at = NOW() WHERE id = ?`;
+      await this.dbService.query(query_text, [input.statusId, input.id]);
+      return {
+        status: true,
+        message: 'Real estate status successfully change',
+      };
+    } catch (err) {
+      console.log('Error in updateStatusRealEstate', err);
     }
   }
 
@@ -306,8 +335,6 @@ export class RealEstateService {
     params: GetRealEstatesQueryDto,
   ): Promise<RealEstateDto[]> {
     const { users, id, search, isFavorites, filter, onlyMy } = params;
-    const baseUrl = 'https://turan-nedvijimost.kg';
-    // const baseUrl = 'http://localhost:3001';
     let otherFilters: string[] = [];
     let queryParams: any[] = [];
 

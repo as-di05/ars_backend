@@ -58,6 +58,11 @@ export interface InputRealEstateDto {
   currency?: string;
 }
 
+export interface InputStatusRealEstateDto {
+  id: number;
+  statusId: number;
+}
+
 export interface PriceDto {
   id: number;
   idRealEstate: number;
