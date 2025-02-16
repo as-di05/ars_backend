@@ -10,6 +10,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { RealEstateModule } from './real_estate/real_estate.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { join } from 'path';
     AuthModule,
     CategoriesModule,
     RealEstateModule,
+    CustomersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

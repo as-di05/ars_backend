@@ -43,3 +43,18 @@ SELECT
 FROM real_estate_objects re
     INNER JOIN users u ON u.id = re.employee_id
     INNER JOIN categories c ON c.id = re.category_id
+
+
+JAWSDB_URL: mysql://username:password@host:port/database
+
+mysql://i5cncb2r745iiuwk:d5ue2y4w7z8rabho@gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/kn1av5tf8p91tiix
+
+
+mysqldump -h abc123.cleardb.net -u user123 -p'password123' mydatabase > backup.sql
+
+sudo mysqldump -h gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com -u i5cncb2r745iiuwk -p d5ue2y4w7z8rabho database > backup.sql
+
+mysqldump --no-tablespaces -h gk90usy5ik2otcvi.cbetxkdyhwsb.us-east-1.rds.amazonaws.com -u i5cncb2r745iiuwk -p d5ue2y4w7z8rabho database > backup.sql
+
+
+sudo mysqldump -u root -p ars_crm > backup.sql
