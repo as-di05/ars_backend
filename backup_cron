@@ -1,0 +1,2 @@
+# Запуск бэкапа каждый день в 2 часа ночи
+0 2 * * * /Users/h9/Desktop/ars_сrm/ars_backend/backup_db.sh >> /Users/h9/Desktop/ars_сrm/ars_backend/database_backups/backup.log 2>&1 
