@@ -42,10 +42,10 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new UnauthorizedInterceptor());
 
-  // Catch-all route handler for SPA
-  app.use('*', (req, res) => {
-    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  });
+  // // Catch-all route handler for SPA
+  // app.use('*', (req, res) => {
+  //   res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+  // });
 
   await app.listen(process.env.PORT || 3001, '0.0.0.0');
 
