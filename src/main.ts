@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { UnauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -30,6 +31,7 @@ async function bootstrap() {
     // origin: 'http://localhost:3000',
     origin: process.env.BASE_URL || 'https://turan-nedvijimost.kg',
   });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -37,6 +39,13 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalInterceptors(new UnauthorizedInterceptor());
+
+  // Catch-all route handler for SPA
+  app.use('*', (req, res) => {
+    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+  });
 
   await app.listen(process.env.PORT || 3001, '0.0.0.0');
 
