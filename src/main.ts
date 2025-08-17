@@ -8,25 +8,11 @@ import { UnauthorizedInterceptor } from './interceptors/unauthorized.interceptor
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // Serve static files from public directory
   app.use(express.static(join(__dirname, '..', 'public')));
 
-  // app.use('*', (req, res) => {
-  //   res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  // });
-  app.use((req, res, next) => {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-      return res.redirect(`https://${req.hostname}${req.url}`);
-    }
-    next();
-  });
-
-  app.use((req, res, next) => {
-    if (req.hostname === 'www.turan-nedvijimost.kg') {
-      return res.redirect(301, `https://turan-nedvijimost.kg${req.url}`);
-    }
-    next();
-  });
-
+  // CORS configuration - allow all your domains
   app.enableCors({
     origin: [
       'https://turan-nedvijimost.kg',
@@ -54,6 +40,11 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new UnauthorizedInterceptor());
+
+  // Catch-all route handler for SPA - this should be last
+  app.use('*', (req, res) => {
+    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
+  });
 
   await app.listen(process.env.PORT || 3001, '0.0.0.0');
 
