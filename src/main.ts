@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { UnauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,6 +43,36 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new UnauthorizedInterceptor());
+
+  // Catch-all handler для SPA - должен быть последним
+  // Отдаем index.html для всех маршрутов, которые не являются API или статическими файлами
+  app.use((req, res, next) => {
+    // Пропускаем API маршруты
+    if (
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/auth') ||
+      req.path.startsWith('/users') ||
+      req.path.startsWith('/categories') ||
+      req.path.startsWith('/real_estate') ||
+      req.path.startsWith('/customers') ||
+      req.path.startsWith('/uploads')
+    ) {
+      return next();
+    }
+    
+    // Пропускаем статические файлы (ServeStaticModule обработает их)
+    // Если это файл с расширением, пропускаем
+    if (req.path.includes('.') && !req.path.endsWith('/')) {
+      return next();
+    }
+    
+    // Для всех остальных маршрутов отдаем index.html (SPA routing)
+    res.sendFile(join(__dirname, '..', 'public', 'index.html'), (err) => {
+      if (err) {
+        next(err);
+      }
+    });
+  });
 
   await app.listen(process.env.PORT || 3001, '0.0.0.0');
 

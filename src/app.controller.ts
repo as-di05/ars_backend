@@ -1,12 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  // Контроллер оставлен пустым
+  // Фронтенд обслуживается через ServeStaticModule и catch-all middleware в main.ts
+  // Все API маршруты находятся в других модулях (auth, users, categories, etc.)
 }

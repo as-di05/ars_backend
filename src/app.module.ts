@@ -18,6 +18,7 @@ import { CustomersModule } from './customers/customers.module';
     DatabaseModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
