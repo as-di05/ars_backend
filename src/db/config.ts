@@ -9,6 +9,7 @@ export const databaseConfig = (configService: ConfigService) => ({
     user: configService.get('DB_USER'),
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_NAME'),
+    charset: 'utf8mb4', // Правильная кодировка для кириллицы
   },
   pool: { min: 2, max: 10 },
   migrations: {

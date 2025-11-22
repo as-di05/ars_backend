@@ -47,13 +47,14 @@ async function bootstrap() {
   // Catch-all handler для SPA - должен быть последним
   // Отдаем index.html для всех маршрутов, которые не являются API или статическими файлами
   app.use((req, res, next) => {
-    // Пропускаем API маршруты
+    // Пропускаем API маршруты (проверяем оба варианта: с дефисом и подчеркиванием)
     if (
       req.path.startsWith('/api') ||
       req.path.startsWith('/auth') ||
       req.path.startsWith('/users') ||
       req.path.startsWith('/categories') ||
-      req.path.startsWith('/real_estate') ||
+      req.path.startsWith('/real-estate') || // с дефисом (как в контроллере)
+      req.path.startsWith('/real_estate') || // с подчеркиванием (на всякий случай)
       req.path.startsWith('/customers') ||
       req.path.startsWith('/uploads')
     ) {

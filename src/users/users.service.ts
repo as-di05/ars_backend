@@ -178,7 +178,17 @@ export class UsersService {
     `;
     const res = await this.dbService.query(query);
     if (Array.isArray(res) && res.length) {
-      return res;
+      // Парсим JSON строки role в объекты
+      return res.map(user => {
+        if (user.role && typeof user.role === 'string') {
+          try {
+            user.role = JSON.parse(user.role);
+          } catch (e) {
+            console.error('Error parsing role JSON:', e);
+          }
+        }
+        return user;
+      });
     }
     return [];
   }
@@ -207,7 +217,16 @@ export class UsersService {
     try {
       const res = await this.dbService.query(query, [userId]);
       if (Array.isArray(res) && res.length) {
-        return res[0];
+        const user = res[0];
+        // Парсим JSON строку role в объект, если она пришла как строка
+        if (user.role && typeof user.role === 'string') {
+          try {
+            user.role = JSON.parse(user.role);
+          } catch (e) {
+            console.error('Error parsing role JSON:', e);
+          }
+        }
+        return user;
       }
       return null;
     } catch (error) {
