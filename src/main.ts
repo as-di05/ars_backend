@@ -1,35 +1,36 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import * as express from 'express';
-import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { UnauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.use(express.static(join(__dirname, '..', 'public')));
 
-  // app.use('*', (req, res) => {
-  //   res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  // });
-  app.use((req, res, next) => {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-      return res.redirect(`https://${req.hostname}${req.url}`);
-    }
-    next();
-  });
-
-  app.use((req, res, next) => {
-    if (req.hostname === 'www.turan-nedvijimost.kg') {
-      return res.redirect(301, `https://turan-nedvijimost.kg${req.url}`);
-    }
-    next();
-  });
+  // CORS настройка - разрешаем запросы с фронтенда
+  const allowedOrigins = [
+    process.env.BASE_URL || 'https://turan-nedvijimost.kg',
+    'http://localhost:3000', // для разработки
+    'http://localhost:3001', // для разработки
+  ].filter(Boolean);
 
   app.enableCors({
-    // origin: 'http://localhost:3000',
-    origin: process.env.BASE_URL || 'https://turan-nedvijimost.kg',
+    origin: (origin, callback) => {
+      // Разрешаем запросы без origin (например, Postman, мобильные приложения)
+      if (!origin) {
+        return callback(null, true);
+      }
+      // Разрешаем запросы с разрешенных источников
+      if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+        return callback(null, true);
+      }
+      // В режиме разработки разрешаем все
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+      callback(null, true); // Разрешаем все для упрощения
+    },
+    credentials: true,
   });
 
   app.useGlobalPipes(
