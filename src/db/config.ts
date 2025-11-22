@@ -11,7 +11,20 @@ export const databaseConfig = (configService: ConfigService) => ({
     database: configService.get('DB_NAME'),
     charset: 'utf8mb4', // Правильная кодировка для кириллицы
   },
-  pool: { min: 2, max: 10 },
+  pool: { 
+    min: 2, 
+    max: 10,
+    // Устанавливаем кодировку для каждого нового соединения
+    afterCreate: (conn: any, done: any) => {
+      conn.query('SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;', (err: any) => {
+        if (err) {
+          done(err, conn);
+        } else {
+          done(null, conn);
+        }
+      });
+    },
+  },
   migrations: {
     tableName: 'knex_migrations',
     directory: './src/db/migrations',
