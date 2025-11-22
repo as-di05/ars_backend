@@ -44,6 +44,26 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new UnauthorizedInterceptor());
 
+  // Устанавливаем правильные заголовки для JSON ответов с UTF-8
+  app.use((req, res, next) => {
+    // Для API маршрутов устанавливаем правильный Content-Type с charset
+    if (
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/auth') ||
+      req.path.startsWith('/users') ||
+      req.path.startsWith('/categories') ||
+      req.path.startsWith('/real-estate') ||
+      req.path.startsWith('/real_estate') ||
+      req.path.startsWith('/customers') ||
+      req.path.startsWith('/uploads')
+    ) {
+      // Устанавливаем charset для JSON ответов
+      res.charset = 'utf-8';
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    }
+    next();
+  });
+
   // Catch-all handler для SPA - должен быть последним
   // Отдаем index.html для всех маршрутов, которые не являются API или статическими файлами
   app.use((req, res, next) => {

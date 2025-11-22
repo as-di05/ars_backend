@@ -39,6 +39,9 @@ server {
     listen 80;
     server_name _;
     
+    # Устанавливаем кодировку по умолчанию
+    charset utf-8;
+    
     client_max_body_size 50M;
     client_body_timeout 30s;
     client_header_timeout 30s;
@@ -93,6 +96,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Accept-Charset "utf-8";
         proxy_cache_bypass \$http_upgrade;
         proxy_connect_timeout 10s;
         proxy_send_timeout 60s;
@@ -100,6 +104,7 @@ server {
         proxy_buffering on;
         proxy_buffer_size 4k;
         proxy_buffers 8 4k;
+        proxy_pass_header Content-Type;
     }
     
     # Auth endpoint
@@ -111,13 +116,15 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Accept-Charset "utf-8";
         proxy_connect_timeout 10s;
         proxy_send_timeout 30s;
         proxy_read_timeout 30s;
+        proxy_pass_header Content-Type;
     }
     
     # Other API routes
-    location ~ ^/(users|categories|real_estate|customers)/ {
+    location ~ ^/(users|categories|real-estate|real_estate|customers)/ {
         limit_req zone=api_limit burst=10 nodelay;
         proxy_pass http://127.0.0.1:3001;
         proxy_http_version 1.1;
@@ -125,9 +132,13 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
+        # Устанавливаем правильную кодировку для проксирования
+        proxy_set_header Accept-Charset "utf-8";
         proxy_connect_timeout 10s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
+        # Сохраняем заголовки Content-Type от бэкенда
+        proxy_pass_header Content-Type;
     }
     
     # Health check
