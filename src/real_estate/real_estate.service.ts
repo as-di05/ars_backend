@@ -382,19 +382,18 @@ export class RealEstateService {
     let filterPrice = 'NULL AS prices';
     // if (roleId === 1) {
     filterPrice = `
-        COALESCE((
-            SELECT JSON_ARRAYAGG(
-                JSON_OBJECT(
-                    'id', ph.id,
-                    'ownerPrice', ph.owner_price,
-                    'objectPrice', ph.object_price,
-                    'currency', ph.currency,
-                    'createdAt', ph.created_at,
-                    'updatedAt', ph.updated_at
-                )
-            ) FROM re_price_history ph
-            WHERE ph.id_real_estate = re.id
-        ), JSON_ARRAY()) AS prices
+        (SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', ph.id,
+                'ownerPrice', ph.owner_price,
+                'objectPrice', ph.object_price,
+                'currency', ph.currency,
+                'createdAt', ph.created_at,
+                'updatedAt', ph.updated_at
+            )
+        ) FROM re_price_history ph
+        WHERE ph.id_real_estate = re.id
+        ) AS prices
       `;
     // }
 
@@ -473,24 +472,22 @@ export class RealEstateService {
           re.description,
           rf.id as ids,
           IF(rf.id_user IS NOT NULL, 1, 0) AS isFavorite,
-          COALESCE((
-            SELECT JSON_ARRAYAGG(
+          (SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
                     'id', d.id,
                     'label', d.label
                 )
             ) FROM re_documents rd
             INNER JOIN documents d ON d.id = rd.id_document AND rd.id_real_estate = re.id
-          ), JSON_ARRAY()) AS documents,
-          COALESCE((
-            SELECT JSON_ARRAYAGG(
+          ) AS documents,
+          (SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
                     'id', rp.id,
                     'url', rp.name
                 )
             ) FROM re_photos rp
             WHERE rp.id_real_estate = re.id
-          ), JSON_ARRAY()) AS images,
+          ) AS images,
           ${filterPrice}
       FROM real_estate_objects re
       INNER JOIN users u ON u.id = re.employee_id
@@ -505,64 +502,11 @@ export class RealEstateService {
     try {
       const res = await this.dbService.query(query, queryParams);
       if (Array.isArray(res) && res.length) {
-        // Обрабатываем результаты, чтобы гарантировать, что images, documents и prices всегда массивы
-        return res.map((item: any) => {
-          // Парсим JSON строки, если они есть
-          const parseJsonField = (field: any) => {
-            if (field === null || field === undefined) {
-              return [];
-            }
-            if (typeof field === 'string') {
-              try {
-                const parsed = JSON.parse(field);
-                return Array.isArray(parsed) ? parsed : [];
-              } catch (e) {
-                return [];
-              }
-            }
-            return Array.isArray(field) ? field : [];
-          };
-
-          // Обрабатываем images
-          if (item.images !== undefined) {
-            item.images = parseJsonField(item.images);
-          } else {
-            item.images = [];
-          }
-
-          // Обрабатываем documents
-          if (item.documents !== undefined) {
-            item.documents = parseJsonField(item.documents);
-          } else {
-            item.documents = [];
-          }
-
-          // Обрабатываем prices
-          if (item.prices !== undefined) {
-            item.prices = parseJsonField(item.prices);
-          } else {
-            item.prices = [];
-          }
-
-          // Парсим другие JSON поля, если они строки
-          const jsonFields = ['category', 'dealType', 'district', 'employee'];
-          jsonFields.forEach((field) => {
-            if (item[field] && typeof item[field] === 'string') {
-              try {
-                item[field] = JSON.parse(item[field]);
-              } catch (e) {
-                // Игнорируем ошибки парсинга
-              }
-            }
-          });
-
-          return item;
-        });
+        return res;
       }
       return [];
     } catch (error) {
       console.log('Error in getRealEstates:', error);
-      return [];
     }
   }
 

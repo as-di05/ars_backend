@@ -208,19 +208,18 @@ export class CustomersService {
             co.created_at AS createdAt, 
             co.updated_at AS updatedAt, 
             co.description,
-            COALESCE((
-                SELECT JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'id', op.id,
-                        'startPrice', op.start_price,
-                        'endPrice', op.end_price,
-                        'currency', op.currency,
-                        'createdAt', op.created_at,
-                        'updatedAt', op.updated_at
-                    )
-                ) FROM customer_obj_prices op
-                WHERE op.id_customer_obj = co.id
-            ), JSON_ARRAY()) AS prices
+            (SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', op.id,
+                    'startPrice', op.start_price,
+                    'endPrice', op.end_price,
+                    'currency', op.currency,
+                    'createdAt', op.created_at,
+                    'updatedAt', op.updated_at
+                )
+            ) FROM customer_obj_prices op
+            WHERE op.id_customer_obj = co.id
+            ) AS prices
         FROM customers_objects co
         INNER JOIN users u ON u.id = co.employee_id
         INNER JOIN categories c ON c.id = co.category_id
@@ -231,50 +230,11 @@ export class CustomersService {
     try {
       const res = await this.dbService.query(query, queryParams);
       if (Array.isArray(res) && res.length) {
-        // Обрабатываем результаты, чтобы гарантировать, что prices всегда массив
-        return res.map((item: any) => {
-          // Парсим JSON строки, если они есть
-          const parseJsonField = (field: any) => {
-            if (field === null || field === undefined) {
-              return [];
-            }
-            if (typeof field === 'string') {
-              try {
-                const parsed = JSON.parse(field);
-                return Array.isArray(parsed) ? parsed : [];
-              } catch (e) {
-                return [];
-              }
-            }
-            return Array.isArray(field) ? field : [];
-          };
-
-          // Обрабатываем prices
-          if (item.prices !== undefined) {
-            item.prices = parseJsonField(item.prices);
-          } else {
-            item.prices = [];
-          }
-
-          // Парсим другие JSON поля, если они строки
-          const jsonFields = ['category', 'district', 'employee'];
-          jsonFields.forEach((field) => {
-            if (item[field] && typeof item[field] === 'string') {
-              try {
-                item[field] = JSON.parse(item[field]);
-              } catch (e) {
-                // Игнорируем ошибки парсинга
-              }
-            }
-          });
-
-          return item;
-        });
+        return res;
       }
       return [];
     } catch (error) {
       console.log('Error in getCustomersObjects:', error);
-      return [];
     }
   }
 }

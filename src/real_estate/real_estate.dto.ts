@@ -35,7 +35,6 @@ export interface RealEstateDto {
   description: string;
   prices?: PriceDto[];
   documents?: CommonType[];
-  images?: Array<{ id: number; url: string }>;
 }
 
 export interface InputRealEstateDto {
