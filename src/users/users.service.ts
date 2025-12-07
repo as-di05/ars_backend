@@ -179,7 +179,7 @@ export class UsersService {
     const res = await this.dbService.query(query);
     if (Array.isArray(res) && res.length) {
       // Парсим JSON строки role в объекты
-      return res.map(user => {
+      return res.map((user) => {
         if (user.role && typeof user.role === 'string') {
           try {
             user.role = JSON.parse(user.role);
@@ -216,6 +216,8 @@ export class UsersService {
     `;
     try {
       const res = await this.dbService.query(query, [userId]);
+
+      console.log(res, '---res');
       if (Array.isArray(res) && res.length) {
         const user = res[0];
         // Парсим JSON строку role в объект, если она пришла как строка
@@ -235,6 +237,7 @@ export class UsersService {
   }
 
   async updateUser(
+    currentUser: { id: number; roleId: number },
     userId: number,
     updateUserDto: UpdateUserDto,
   ): Promise<ApiResponseDto> {
@@ -245,6 +248,8 @@ export class UsersService {
       if (!Array.isArray(res) || !res.length) {
         return new ApiResponseDto(false, 'User not found', null, userId);
       }
+      const updatedRoleId =
+        currentUser.id === userId && currentUser.roleId === 1 ? 1 : roleId;
 
       query_text = `
         UPDATE users SET 
@@ -257,7 +262,7 @@ export class UsersService {
       `;
       await this.dbService.query(query_text, [
         login,
-        roleId,
+        updatedRoleId,
         firstName,
         lastName,
         userId,

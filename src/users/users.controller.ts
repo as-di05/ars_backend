@@ -61,7 +61,11 @@ export class UsersController {
     if (!Number(id) || (roleId > 1 && Number(id) !== userId)) {
       throw new ForbiddenException('Access denied!');
     }
-    return this.usersService.updateUser(Number(id), updateUserDto);
+    return this.usersService.updateUser(
+      { id: userId, roleId: roleId },
+      Number(id),
+      updateUserDto,
+    );
   }
 
   @Put('update-password')
