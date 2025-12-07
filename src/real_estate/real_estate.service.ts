@@ -66,7 +66,9 @@ export class RealEstateService {
           ? null
           : input.idWallMaterial,
         input.idHeating ?? null,
-        input.description ?? null,
+        typeof input.description === 'string' && input.description === 'null'
+          ? null
+          : input.description,
       ]);
 
       const idRealEstate = res?.insertId ?? null;
