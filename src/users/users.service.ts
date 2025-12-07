@@ -216,8 +216,6 @@ export class UsersService {
     `;
     try {
       const res = await this.dbService.query(query, [userId]);
-
-      console.log(res, '---res');
       if (Array.isArray(res) && res.length) {
         const user = res[0];
         // Парсим JSON строку role в объект, если она пришла как строка

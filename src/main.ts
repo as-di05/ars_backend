@@ -17,21 +17,20 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Разрешаем запросы без origin (например, Postman, мобильные приложения)
       if (!origin) {
         return callback(null, true);
       }
-      // Разрешаем запросы с разрешенных источников
-      if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-        return callback(null, true);
-      }
-      // В режиме разработки разрешаем все
       if (process.env.NODE_ENV !== 'production') {
         return callback(null, true);
       }
-      callback(null, true); // Разрешаем все для упрощения
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(null, true);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.useGlobalPipes(
