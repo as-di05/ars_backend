@@ -46,6 +46,6 @@ export class CustomersController {
     @Query() query: GetCustomersObjectQueryDto,
   ): Promise<CustomerObjectDto[]> {
     const { userId, roleId } = req.user;
-    return this.customersService.getCustomersObjects(userId, query);
+    return this.customersService.getCustomersObjects(userId, query, roleId);
   }
 }

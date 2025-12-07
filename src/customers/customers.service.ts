@@ -117,6 +117,7 @@ export class CustomersService {
   async getCustomersObjects(
     userId: number,
     params: GetCustomersObjectQueryDto,
+    roleId?: number,
   ): Promise<CustomerObjectDto[]> {
     const { users, id, search, filter, onlyMy } = params;
     let otherFilters: string[] = [];
@@ -164,7 +165,7 @@ export class CustomersService {
       filters = filters ? `${filters} AND co.id = ?` : `WHERE co.id = ?`;
       queryParams.push(id);
     }
-    if (onlyMy === 'true') {
+    if (onlyMy === 'true' && roleId === 3) {
       filters = filters
         ? `${filters} AND co.employee_id = ?`
         : `WHERE co.employee_id = ?`;
