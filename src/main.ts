@@ -8,11 +8,10 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // CORS настройка - разрешаем запросы с фронтенда
   const allowedOrigins = [
     process.env.BASE_URL || 'https://turan-nedvijimost.kg',
-    'http://localhost:3000', // для разработки
-    'http://localhost:3001', // для разработки
+    'http://localhost:3000',
+    'http://localhost:3001',
   ].filter(Boolean);
 
   app.enableCors({
@@ -20,14 +19,17 @@ async function bootstrap() {
       if (!origin) {
         return callback(null, true);
       }
-      if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-        return callback(null, true);
-      }
       if (process.env.NODE_ENV !== 'production') {
         return callback(null, true);
       }
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(null, true);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.useGlobalPipes(
@@ -76,13 +78,13 @@ async function bootstrap() {
     ) {
       return next();
     }
-    
+
     // Пропускаем статические файлы (ServeStaticModule обработает их)
     // Если это файл с расширением, пропускаем
     if (req.path.includes('.') && !req.path.endsWith('/')) {
       return next();
     }
-    
+
     // Для всех остальных маршрутов отдаем index.html (SPA routing)
     res.sendFile(join(__dirname, '..', 'public', 'index.html'), (err) => {
       if (err) {
